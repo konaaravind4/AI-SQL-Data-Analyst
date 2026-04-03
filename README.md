@@ -1,81 +1,74 @@
-# AI SQL Data Analyst 📊
+# AI SQL Data Analyst
 
-[![CI](https://github.com/konaaravind4/AI-SQL-Data-Analyst/actions/workflows/ci.yml/badge.svg)](https://github.com/konaaravind4/AI-SQL-Data-Analyst/actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/python-3.11-blue)
-![Gemini](https://img.shields.io/badge/gemini-1.5_flash-orange)
-![Streamlit](https://img.shields.io/badge/streamlit-1.35-red)
+Convert plain-English business questions into optimized PostgreSQL queries with instant result visualization. Powered by **Google Gemini** with schema-aware prompting.
 
-Ask **plain-English business questions → get optimized SQL + interactive charts instantly**. Powered by Gemini 1.5 Flash with schema-aware prompting and automatic Plotly visualization.
+## Features
 
-## 🏗️ Architecture
+- 🗣️ **Natural Language → SQL** — ask in plain English, get accurate SQL
+- 🔒 **SQL injection prevention** — only SELECT queries allowed
+- 📊 **Structured results** — JSON rows + column names + plain explanation
+- 🚀 **FastAPI REST API** — `/query`, `/schema`, `/health`
+- 📦 **Docker-ready** — one-command deployment
+
+## Architecture
 
 ```
-User Question (natural language)
-        │
-        ▼
-NL2SQL (Gemini 1.5 Flash)  ← schema-aware few-shot prompting
-        │ SQL
-        ▼
-QueryExecutor (SQLAlchemy + PostgreSQL)
-  ├── SQL injection prevention (regex + READ ONLY txn)
-  └── Schema auto-introspection via information_schema
-        │ DataFrame
-        ▼
-Visualizer (Plotly) ← auto chart type: bar/line/area/scatter/pie/histogram
-        │ chart + explanation
-        ▼
-Streamlit UI  /  FastAPI REST
+User Question → Schema Injection → Gemini Prompt → SQL Generation → PostgreSQL → JSON Response
 ```
 
-## 📊 Metrics
+## Quick Start
+
+```bash
+git clone https://github.com/konaaravind4/AI-SQL-Data-Analyst
+cd AI-SQL-Data-Analyst
+cp .env.example .env
+# Edit .env with your Gemini API key and DB URL
+pip install -r requirements.txt
+uvicorn api.main:app --host 0.0.0.0 --port 8000
+```
+
+## Docker
+
+```bash
+docker build -t ai-sql-analyst .
+docker run -p 8000:8000 \
+  -e GEMINI_API_KEY=your_key \
+  -e DATABASE_URL=postgresql://user:pass@host:5432/db \
+  ai-sql-analyst
+```
+
+## API Usage
+
+```bash
+# Ask a question
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Show top 5 customers by revenue this month"}'
+
+# Get database schema
+curl http://localhost:8000/schema
+```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `GEMINI_API_KEY` | — | Google Gemini API key |
+| `DATABASE_URL` | `postgresql://...` | PostgreSQL connection string |
+
+## Metrics
 
 | Metric | Value |
 |--------|-------|
 | SQL Accuracy | 96% |
-| Query Speed | < 1.2s |
+| Query Speed | <1.2s |
 | Chart Types | 12+ |
 | Tables Supported | Unlimited |
 
----
+## Tech Stack
 
-## 🚀 Quick Start
+`Python` · `Google Gemini` · `FastAPI` · `PostgreSQL` · `SQLAlchemy` · `Pandas` · `Docker`
 
-```bash
-git clone https://github.com/konaaravind4/AI-SQL-Data-Analyst.git
-cd AI-SQL-Data-Analyst
-pip install -r requirements.txt
+## License
 
-# Set environment variables
-export GEMINI_API_KEY=your_key
-export DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
-
-# Start API backend
-uvicorn api.main:app --port 8002
-# Start Streamlit UI (separate terminal)
-streamlit run frontend/app.py
-```
-
-## 💡 Example Queries
-
-| Question | Chart Generated |
-|----------|-----------------|
-| "Top 10 customers by revenue this month" | Horizontal bar |
-| "Daily sales for last 30 days" | Area chart |
-| "Distribution of order values" | Histogram |
-| "Sales by region vs last quarter" | Grouped bar |
-
-## 📁 Structure
-
-```
-AI-SQL-Data-Analyst/
-├── backend/
-│   ├── nl2sql.py       # Gemini schema-aware SQL generation
-│   ├── executor.py     # Safe SQLAlchemy execution + schema introspection
-│   └── visualizer.py   # Auto Plotly chart selection
-├── api/
-│   └── main.py         # FastAPI REST endpoint
-├── frontend/
-│   └── app.py          # Streamlit dark UI
-└── tests/
-    └── test_nl2sql.py
-```
+MIT

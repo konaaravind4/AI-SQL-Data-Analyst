@@ -1,99 +1,79 @@
 """
-FastAPI REST API for AI SQL Data Analyst.
+api/main.py — FastAPI REST API for AI SQL Data Analyst.
+
+Endpoints:
+    POST /query     — Convert NL question to SQL and return results + chart spec
+    GET  /schema    — Return current database schema
+    GET  /health    — Health check
 """
-from __future__ import annotations
 
+import os
 import logging
-import time
-from contextlib import asynccontextmanager
-from typing import Optional
-
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from typing import Optional, Any
 
-from backend.nl2sql import NL2SQL
-from backend.executor import QueryExecutor
-from backend.visualizer import Visualizer
+from backend.analyst import nl_to_sql, explain_query
+from backend.database import get_schema, execute_query
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-nl2sql: Optional[NL2SQL] = None
-executor: Optional[QueryExecutor] = None
-viz = Visualizer()
+app = FastAPI(
+    title="AI SQL Data Analyst",
+    description="Convert plain-English questions to SQL and get instant results.",
+    version="1.0.0",
+)
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    global nl2sql, executor
-    nl2sql = NL2SQL()
-    executor = QueryExecutor()
-    yield
-
-
-app = FastAPI(title="AI SQL Data Analyst API", version="1.0.0", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-
+# ─── Schemas ──────────────────────────────────────────────────────────────────
 
 class QueryRequest(BaseModel):
-    question: str = Field(..., min_length=3)
-    chart_type: str = "auto"
-    max_rows: int = Field(100, ge=1, le=10000)
+    question: str = Field(..., min_length=3, max_length=1000)
+    model: str = Field("gemini-1.5-flash")
 
+
+class QueryResponse(BaseModel):
+    question: str
+    sql: str
+    explanation: str
+    rows: list[dict]
+    column_names: list[str]
+    row_count: int
+
+
+# ─── Endpoints ────────────────────────────────────────────────────────────────
 
 @app.get("/health")
-async def health() -> dict:
+async def health():
     return {"status": "ok"}
 
 
-@app.post("/query")
-async def query(req: QueryRequest) -> dict:
-    if not nl2sql or not executor:
-        raise HTTPException(status_code=503, detail="Service not ready")
-
-    t0 = time.monotonic()
-
-    # Get schema
-    try:
-        schema = executor.get_schema()
-    except Exception:
-        schema = "Schema unavailable - use common table names"
-
-    # Generate SQL
-    sql = nl2sql.convert(req.question, schema)
-    valid, err = NL2SQL.validate(sql)
-    if not valid:
-        raise HTTPException(status_code=422, detail=f"Generated invalid SQL: {err}")
-
-    # Execute
-    try:
-        df = executor.execute(sql)
-    except RuntimeError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    # Visualize
-    fig = viz.render(df, chart_type=req.chart_type, title=req.question)
-
-    # Explain
-    explanation = nl2sql.explain(sql, df.head(3).to_string(index=False) if not df.empty else "")
-
-    import plotly.io as pio
-    latency_ms = (time.monotonic() - t0) * 1000
-
-    return {
-        "sql": sql,
-        "explanation": explanation,
-        "row_count": len(df),
-        "column_count": len(df.columns),
-        "chart_json": pio.to_json(fig),
-        "chart_type_used": req.chart_type,
-        "latency_ms": round(latency_ms, 1),
-        "results": df.head(req.max_rows).to_dict(orient="records"),
-    }
-
-
 @app.get("/schema")
-async def get_schema() -> dict:
-    if not executor:
-        raise HTTPException(status_code=503, detail="Service not ready")
-    return {"schema": executor.get_schema()}
+async def schema():
+    try:
+        return {"schema": get_schema()}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/query", response_model=QueryResponse)
+async def query(req: QueryRequest):
+    try:
+        schema_str = get_schema()
+        sql = nl_to_sql(req.question, schema_str, model_name=req.model)
+        explanation = explain_query(sql, model_name=req.model)
+        df = execute_query(sql)
+        return QueryResponse(
+            question=req.question,
+            sql=sql,
+            explanation=explanation,
+            rows=df.to_dict(orient="records"),
+            column_names=list(df.columns),
+            row_count=len(df),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        logger.exception("Query processing failed")
+        raise HTTPException(status_code=500, detail=str(exc))
