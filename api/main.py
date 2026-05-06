@@ -26,7 +26,7 @@ app = FastAPI(
 )
 
 
-# ─── Schemas ──────────────────────────────────────────────────────────────────
+#Schemas
 
 class QueryRequest(BaseModel):
     question: str = Field(..., min_length=3, max_length=1000)
@@ -42,7 +42,7 @@ class QueryResponse(BaseModel):
     row_count: int
 
 
-# ─── Endpoints ────────────────────────────────────────────────────────────────
+# Endpoints
 
 @app.get("/health")
 async def health():
