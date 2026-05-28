@@ -4,11 +4,11 @@ Convert plain-English business questions into optimized PostgreSQL queries with 
 
 ## Features
 
-- 🗣️ **Natural Language → SQL** — ask in plain English, get accurate SQL
-- 🔒 **SQL injection prevention** — only SELECT queries allowed
-- 📊 **Structured results** — JSON rows + column names + plain explanation
-- 🚀 **FastAPI REST API** — `/query`, `/schema`, `/health`
-- 📦 **Docker-ready** — one-command deployment
+-  **Natural Language → SQL** — ask in plain English, get accurate SQL
+-  **SQL injection prevention** — only SELECT queries allowed
+-  **Structured results** — JSON rows + column names + plain explanation
+-  **FastAPI REST API** — `/query`, `/schema`, `/health`
+-  **Docker-ready** — one-command deployment
 
 ## Architecture
 
