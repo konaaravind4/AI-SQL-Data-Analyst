@@ -1,4 +1,4 @@
-# AI SQL Data Analyst 🔍
+# AI SQL Data Analyst 
 
 > **Convert plain-English business questions into optimized SQL queries — now with multi-model support (Gemini + Claude + OpenAI), KonaDB backend, query history with RAG suggestions, and streaming results.**
 
@@ -13,7 +13,7 @@ Convert plain-English business questions into optimized PostgreSQL queries with 
 
 ---
 
-## ✨ Features
+##  Features
 
 | Feature | Description |
 |---------|-------------|
@@ -30,7 +30,7 @@ Convert plain-English business questions into optimized PostgreSQL queries with 
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 User Question
@@ -62,7 +62,7 @@ JSON Response + Explanation + History Save
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ```bash
 git clone https://github.com/konaaravind4/AI-SQL-Data-Analyst
@@ -75,7 +75,7 @@ uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 ---
 
-## 🐳 Docker
+##  Docker
 
 ```bash
 docker build -t ai-sql-analyst .
@@ -94,7 +94,7 @@ docker run -p 8000:8000 \
 
 ---
 
-## 📡 API Reference
+##  API Reference
 
 ### Query (Single Provider)
 
@@ -170,7 +170,7 @@ curl http://localhost:8000/schema/orders
 
 ---
 
-## 🧩 Multi-Model Support (New!)
+##  Multi-Model Support (New!)
 
 Use any LLM provider or let the system auto-select:
 
@@ -198,7 +198,7 @@ for provider, result in comparisons.items():
 
 ---
 
-## 💾 KonaDB Backend (New!)
+## KonaDB Backend (New!)
 
 Use [KonaDB](https://github.com/konaaravind4/kona-db) instead of PostgreSQL — zero infrastructure needed:
 
@@ -220,7 +220,7 @@ curl -X POST http://localhost:8000/query \
 
 ---
 
-## 🌍 Ecosystem Integration
+##  Ecosystem Integration
 
 ```
 AI-SQL-Data-Analyst
@@ -240,7 +240,7 @@ AI-SQL-Data-Analyst
 
 ---
 
-## 🤝 Related Projects
+##  Related Projects
 
 | Project | Integration |
 |---------|-------------|
@@ -251,6 +251,6 @@ AI-SQL-Data-Analyst
 
 ---
 
-## 📄 License
+##  License
 
 MIT © [konaaravind4](https://github.com/konaaravind4)
