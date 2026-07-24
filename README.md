@@ -22,11 +22,11 @@ Convert plain-English business questions into optimized PostgreSQL queries with 
 | **Structured Results** | JSON rows + column names + plain explanation |
 | **FastAPI REST API** | `/query`, `/schema`, `/health`, `/stream` |
 | **Docker-ready** | One-command deployment |
-| **🆕 Multi-Model Support** | Gemini + Claude + OpenAI with auto-fallback |
-| **🆕 KonaDB Backend** | Use `kona://` instead of PostgreSQL |
-| **🆕 Query History + RAG** | Suggest similar past queries using vector search |
-| **🆕 Streaming Results** | WebSocket endpoint for large result sets |
-| **🆕 Model Comparison** | Run all providers and compare SQL outputs |
+| **Multi-Model Support** | Gemini + Claude + OpenAI with auto-fallback |
+| **KonaDB Backend** | Use `kona://` instead of PostgreSQL |
+| **Query History + RAG** | Suggest similar past queries using vector search |
+| **Streaming Results** | WebSocket endpoint for large result sets |
+| **Model Comparison** | Run all providers and compare SQL outputs |
 
 ---
 
