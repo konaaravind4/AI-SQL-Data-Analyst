@@ -35,9 +35,6 @@ from api.multi_model import MultiModelSQLGenerator, ModelProvider
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Application instance
-# ---------------------------------------------------------------------------
 
 app = FastAPI(
     title="AI SQL Data Analyst",
@@ -55,9 +52,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------------------------------------------------------------------------
-# In-memory query history (thread-safe for single-process deployments)
-# ---------------------------------------------------------------------------
 
 _query_history: list[dict] = []
 _MAX_HISTORY = 200  # internal cap; GET /history returns last 20
@@ -70,9 +64,7 @@ def _record_history(entry: dict) -> None:
         _query_history.pop(0)
 
 
-# ---------------------------------------------------------------------------
-# Pydantic schemas
-# ---------------------------------------------------------------------------
+
 
 class QueryRequest(BaseModel):
     """Request body for POST /query."""
@@ -113,9 +105,6 @@ class SimilarRequest(BaseModel):
     question: str = Field(..., min_length=3, max_length=1000)
 
 
-# ---------------------------------------------------------------------------
-# Helper: pick the right generator based on provider
-# ---------------------------------------------------------------------------
 
 def _make_generator(provider: str) -> MultiModelSQLGenerator:
     """
@@ -130,9 +119,7 @@ def _make_generator(provider: str) -> MultiModelSQLGenerator:
     return MultiModelSQLGenerator(provider=provider)  # type: ignore[arg-type]
 
 
-# ---------------------------------------------------------------------------
-# Endpoints
-# ---------------------------------------------------------------------------
+
 
 @app.get("/health", summary="Health check")
 async def health():
@@ -237,11 +224,11 @@ async def query(req: QueryRequest):
         # --- Explanation ---
         explanation = explain_query(sql, model_name=req.model)
 
-        # --- Execution ---
+
         df = execute_query(sql)
         latency_ms = round((time.time() - t_start) * 1000, 1)
 
-        # --- Record in history ---
+   
         _record_history({
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "question": req.question,
