@@ -15,9 +15,6 @@ from typing import Optional, Tuple
 logger = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# Internal helpers
-# ---------------------------------------------------------------------------
 
 def _sanitize_sql(sql: str) -> str:
     """Strip markdown fences and return clean SQL."""
@@ -26,9 +23,6 @@ def _sanitize_sql(sql: str) -> str:
     return sql
 
 
-# ---------------------------------------------------------------------------
-# Public utility functions
-# ---------------------------------------------------------------------------
 
 def safety_check(sql: str) -> Tuple[bool, str]:
     """
@@ -116,7 +110,6 @@ def format_sql(sql: str) -> str:
     # Collapse multiple spaces (but not newlines) into a single space
     lines = [re.sub(r"[ \t]+", " ", line).rstrip() for line in sql.splitlines()]
 
-    # Remove consecutive blank lines
     result_lines: list[str] = []
     prev_blank = False
     for line in lines:
@@ -198,9 +191,6 @@ def estimate_complexity(sql: str) -> str:
     return complexity
 
 
-# ---------------------------------------------------------------------------
-# Core NL→SQL and explanation functions
-# ---------------------------------------------------------------------------
 
 def nl_to_sql(
     question: str,
