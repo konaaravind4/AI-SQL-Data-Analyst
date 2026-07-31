@@ -18,10 +18,6 @@ from sqlalchemy import create_engine, text, inspect
 logger = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# Engine factory
-# ---------------------------------------------------------------------------
-
 def _get_sync_engine():
     """
     Create and return a SQLAlchemy engine.
@@ -71,10 +67,8 @@ def _get_kona_engine(kona_url: str):
     logger.info("Connecting to KonaDB at path: %s (url: %s)", kona_db_path, kona_url)
 
     try:
-        # kona.connect() returns a DBAPI-2 compatible connection; wrap it
-        # with SQLAlchemy using the sqlite dialect (KonaDB is SQLite-compatible)
         conn = kona.connect(kona_db_path or kona_url.replace("kona://", ""))
-        # Use SQLAlchemy's creator pattern to wrap the existing connection
+
         engine = create_engine(
             "sqlite://",
             creator=lambda: conn,
@@ -85,9 +79,7 @@ def _get_kona_engine(kona_url: str):
         raise RuntimeError(f"Failed to connect to KonaDB: {exc}") from exc
 
 
-# ---------------------------------------------------------------------------
-# Schema introspection
-# ---------------------------------------------------------------------------
+
 
 def get_schema(engine=None) -> str:
     """
@@ -210,9 +202,6 @@ def get_column_names(table: str, engine=None) -> List[str]:
     return names
 
 
-# ---------------------------------------------------------------------------
-# Query execution
-# ---------------------------------------------------------------------------
 
 def execute_query(sql: str, engine=None) -> pd.DataFrame:
     """
