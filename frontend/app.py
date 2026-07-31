@@ -20,7 +20,7 @@ st.set_page_config(
 
 API_BASE = os.getenv("API_BASE_URL", "http://localhost:8002")
 
-# ── Page header ──────────────────────────────────────────────────────────────
+
 st.markdown("""
 <style>
 body { background-color: #0f0f1a; }
@@ -35,7 +35,7 @@ body { background-color: #0f0f1a; }
 st.markdown('<h1 class="main-header">🔍 AI SQL Data Analyst</h1>', unsafe_allow_html=True)
 st.caption("Ask plain-English questions → get optimized SQL + instant charts")
 
-# ── Sidebar ──────────────────────────────────────────────────────────────────
+
 with st.sidebar:
     st.header("⚙️ Settings")
     chart_type = st.selectbox(
@@ -59,7 +59,7 @@ with st.sidebar:
         if st.button(ex, use_container_width=True):
             st.session_state["question"] = ex
 
-# ── Main area ─────────────────────────────────────────────────────────────────
+
 col1, col2 = st.columns([3, 1])
 with col1:
     question = st.text_input(
@@ -88,16 +88,16 @@ if analyse and question:
             st.error(f"Error: {e}")
             st.stop()
 
-    # SQL display
+
     if show_sql and data.get("sql"):
         with st.expander("📝 Generated SQL", expanded=True):
             st.code(data["sql"], language="sql")
 
-    # Explanation
+
     if show_explanation and data.get("explanation"):
         st.info(f"💡 **AI Explanation:** {data['explanation']}")
 
-    # Metrics row
+
     if data.get("row_count") is not None:
         cols = st.columns(4)
         cols[0].metric("Rows Returned", data["row_count"])
@@ -105,13 +105,13 @@ if analyse and question:
         cols[2].metric("Columns", data.get("column_count", "—"))
         cols[3].metric("Chart Type", data.get("chart_type_used", "—"))
 
-    # Chart
+
     if data.get("chart_json"):
         import plotly.io as pio, json as _json
         fig = pio.from_json(data["chart_json"])
         st.plotly_chart(fig, use_container_width=True)
 
-    # Data table
+   
     if data.get("results"):
         with st.expander("📊 Raw Data", expanded=False):
             df = pd.DataFrame(data["results"])
